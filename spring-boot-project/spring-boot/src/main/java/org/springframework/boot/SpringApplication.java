@@ -278,11 +278,16 @@ public class SpringApplication {
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+		//配置source
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		//检查是否为web环境   通过核心类判断是否开启、开启什么web容器
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
 		this.bootstrappers = new ArrayList<>(getSpringFactoriesInstances(Bootstrapper.class));
+		//实例化初始器  这里实现自动装配  META-INF/spring.factories
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+		//实例华监听器
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		//配置应用主方法所在的类
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -308,27 +313,39 @@ public class SpringApplication {
 	 * @return a running {@link ApplicationContext}
 	 */
 	public ConfigurableApplicationContext run(String... args) {
+		//计时器
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
+		//创建上下文环境
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
+		//配置Headless属性，Headless模式是在缺少显示屏、键盘或者鼠标时候的系统配置
 		configureHeadlessProperty();
+		//在文件META-INF\spring.factories中获取SpringApplicationRunListener接口的实现类EventPublishingRunListener，主要发布SpringApplicationEvent
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+		//启动监听器  观察者模式
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+			//初始化填充Environment的参数 创建web/no web环境  加载资源  配置监听
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
 			configureIgnoreBeanInfo(environment);
+			//打印banner
 			Banner printedBanner = printBanner(environment);
+			//创建上下文环境
 			context = createApplicationContext();
+			//配置基本属性
 			context.setApplicationStartup(this.applicationStartup);
+			//准备环境所需要的bean工厂
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
 			refreshContext(context);
 			afterRefresh(context, applicationArguments);
+			//结束计时
 			stopWatch.stop();
 			if (this.logStartupInfo) {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), stopWatch);
 			}
+			//结束监听
 			listeners.started(context);
 			callRunners(context, applicationArguments);
 		}
@@ -355,7 +372,7 @@ public class SpringApplication {
 
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 			DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
-		// Create and configure the environment
+		// Create and configure the environment    //新建\获取当前Environment实例
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
@@ -443,10 +460,14 @@ public class SpringApplication {
 	}
 
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
+		//从当前线程获取类加载器
 		ClassLoader classLoader = getClassLoader();
-		// Use names and ensure unique to protect against duplicates
+		// Use names and ensure unique to protect against duplicates 使用名称并确保唯一，以防止重复
+		//Spring的类加载工具会从注册文件META-INF/spring.factories用指定的类加载器加载类，这里返回相应类型的实现类全限定名
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
+		//通过全路径反射获得工厂的class对象，构造方法
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes, classLoader, args, names);
+		//Spring的排序工具，对继承了Ordered接口或者@Priority标记的类进行排序
 		AnnotationAwareOrderComparator.sort(instances);
 		return instances;
 	}
