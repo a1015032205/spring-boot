@@ -6,7 +6,6 @@ group 'org.springframework.boot'
 version '2.4.3-SNAPSHOT'
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
