@@ -326,14 +326,20 @@ public class SpringApplication {
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
 		log.info("========= INIT StopWatch  计时开始===============");
+
 		//创建上下文环境
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
-		//配置Headless属性，Headless模式是在缺少显示屏、键盘或者鼠标时候的系统配置
+
+		// 设置java.awt.headless系统属性，默认为true
+		// Headless模式是系统的一种配置模式。在该模式下，系统缺少了显示设备、键盘或鼠标。
 		configureHeadlessProperty();
-		//在文件META-INF\spring.factories中获取SpringApplicationRunListener接口的实现类EventPublishingRunListener，主要发布SpringApplicationEvent
+
+		//在文件META-INF\spring.factories中获取SpringApplicationRunListener接口的实现类EventPublishingRunListener，
+		//它主要是负责发布SpringApplicationEvent事件的，
+		// 它会利用一个内部的ApplicationEventMulticaster在上下文实际被刷新之前对事件进行处理
 		SpringApplicationRunListeners listeners = getRunListeners(args);
-		//启动监听器  观察者模式
+		//通知监听者 启动
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
@@ -384,10 +390,12 @@ public class SpringApplication {
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
 		ConfigurationPropertySources.attach(environment);
+		// 发布环境准备好的事件
 		listeners.environmentPrepared(bootstrapContext, environment);
 		DefaultPropertiesPropertySource.moveToEnd(environment);
 		configureAdditionalProfiles(environment);
 		bindToSpringApplication(environment);
+		// 非Web环境处理
 		if (!this.isCustomEnvironment) {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
 					deduceEnvironmentClass());
