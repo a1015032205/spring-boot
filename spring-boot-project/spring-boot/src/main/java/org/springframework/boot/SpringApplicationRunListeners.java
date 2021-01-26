@@ -50,12 +50,15 @@ class SpringApplicationRunListeners {
 	}
 
 	void starting(ConfigurableBootstrapContext bootstrapContext, Class<?> mainApplicationClass) {
+		log.info("======监听===starting========");
 		doWithListeners("spring.boot.application.starting", (listener) -> listener.starting(bootstrapContext),
 				(step) -> {
 					if (mainApplicationClass != null) {
 						step.tag("mainApplicationClass", mainApplicationClass.getName());
 					}
 				});
+		log.info("======监听===end========");
+
 	}
 
 	void environmentPrepared(ConfigurableBootstrapContext bootstrapContext, ConfigurableEnvironment environment) {

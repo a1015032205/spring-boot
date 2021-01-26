@@ -23,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 
 import org.springframework.core.env.Environment;
@@ -35,6 +36,7 @@ import org.springframework.util.StringUtils;
  *
  * @author Phillip Webb
  */
+@Slf4j
 class SpringApplicationBannerPrinter {
 
 	static final String BANNER_LOCATION_PROPERTY = "spring.banner.location";
@@ -60,6 +62,7 @@ class SpringApplicationBannerPrinter {
 		Banner banner = getBanner(environment);
 		try {
 			logger.info(createStringFromBanner(banner, environment, sourceClass));
+
 		}
 		catch (UnsupportedEncodingException ex) {
 			logger.warn("Failed to create String for banner", ex);
@@ -75,7 +78,9 @@ class SpringApplicationBannerPrinter {
 
 	private Banner getBanner(Environment environment) {
 		Banners banners = new Banners();
+		log.info("=====扫描是否有自定义banner==包括图片和文字=====");
 		banners.addIfNotNull(getImageBanner(environment));
+		//这里获取自定义的banner
 		banners.addIfNotNull(getTextBanner(environment));
 		if (banners.hasAtLeastOneBanner()) {
 			return banners;
@@ -91,6 +96,7 @@ class SpringApplicationBannerPrinter {
 		Resource resource = this.resourceLoader.getResource(location);
 		try {
 			if (resource.exists() && !resource.getURL().toExternalForm().contains("liquibase-core")) {
+				log.error("=====发现自定义 TXT banner=========");
 				return new ResourceBanner(resource);
 			}
 		}
@@ -109,6 +115,7 @@ class SpringApplicationBannerPrinter {
 		for (String ext : IMAGE_EXTENSION) {
 			Resource resource = this.resourceLoader.getResource("banner." + ext);
 			if (resource.exists()) {
+				log.error("发现自定义图片banner  \"gif\", \"jpg\", \"png\"x");
 				return new ImageBanner(resource);
 			}
 		}
@@ -142,9 +149,14 @@ class SpringApplicationBannerPrinter {
 
 		@Override
 		public void printBanner(Environment environment, Class<?> sourceClass, PrintStream out) {
+			log.info("======输出自定义banner start=====");
 			for (Banner banner : this.banners) {
 				banner.printBanner(environment, sourceClass, out);
 			}
+			log.info("======输出自定义banner end=====");
+			System.out.println();
+			System.out.println();
+			System.out.println();
 		}
 
 	}

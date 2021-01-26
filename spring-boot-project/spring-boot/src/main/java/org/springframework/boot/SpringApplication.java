@@ -268,15 +268,33 @@ public class SpringApplication {
 		//配置source
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
 		//检查是否为web环境   通过核心类判断是否开启、开启什么web容器
+		log.info("=====检查是否为web环境=====");
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+		log.debug(">>>getSpringFactoriesInstances by Bootstrapper start<<<");
 		this.bootstrappers = new ArrayList<>(getSpringFactoriesInstances(Bootstrapper.class));
+		log.debug("getSpringFactoriesInstances by Bootstrapper end");
+		System.out.println();
+		System.out.println();
+		System.out.println();
+		log.debug(">>>getSpringFactoriesInstances by ApplicationContextInitializer start<<");
 		//实例化初始器  这里实现自动装配  META-INF/spring.factories
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+		log.debug("getSpringFactoriesInstances by ApplicationContextInitializer end");
+		System.out.println();
+		System.out.println();
+		System.out.println();
+
+		log.debug(">>>getSpringFactoriesInstances by ApplicationListener start<<");
 		//实例华监听器
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		log.debug(">>>getSpringFactoriesInstances by ApplicationListener end<<");
+		System.out.println();
+		System.out.println();
+		System.out.println();
+
 		//配置应用主方法所在的类
 		this.mainApplicationClass = deduceMainApplicationClass();
-		log.info("========  START INIT SpringApplication  ========");
+		log.error("========  END INIT SpringApplication  ========");
 	}
 
 	private Class<?> deduceMainApplicationClass() {
@@ -304,9 +322,10 @@ public class SpringApplication {
 	 */
 	public ConfigurableApplicationContext run(String... args) {
 		//计时器
+		log.error("=====执行run方法  开始=======");
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		log.info("=========INIT StopWatch===============");
+		log.info("========= INIT StopWatch  计时开始===============");
 		//创建上下文环境
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
@@ -450,7 +469,7 @@ public class SpringApplication {
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type, Class<?>[] parameterTypes, Object... args) {
 		//从当前线程获取类加载器
 		ClassLoader classLoader = getClassLoader();
-		log.error("type:{},classLoader:{}", type.getName(), classLoader);
+		log.error("传递的类:{},类加载器:{}", type.getName(), classLoader.getClass().getName());
 		// Use names and ensure unique to protect against duplicates 使用名称并确保唯一，以防止重复
 		//Spring的类加载工具会从注册文件META-INF/spring.factories用指定的类加载器加载类，这里返回相应类型的实现类全限定名
 		Set<String> names = new LinkedHashSet<>(SpringFactoriesLoader.loadFactoryNames(type, classLoader));
@@ -467,7 +486,7 @@ public class SpringApplication {
 		List<T> instances = new ArrayList<>(names.size());
 		for (String name : names) {
 			try {
-				log.info("监听器：{}", name);
+				log.info("通过读取spring.factories获取的全包名:{}", name);
 				Class<?> instanceClass = ClassUtils.forName(name, classLoader);
 				Assert.isAssignable(type, instanceClass);
 				Constructor<?> constructor = instanceClass.getDeclaredConstructor(parameterTypes);

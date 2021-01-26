@@ -18,6 +18,7 @@ package org.springframework.boot;
 
 import java.io.PrintStream;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.boot.ansi.AnsiStyle;
@@ -28,6 +29,7 @@ import org.springframework.core.env.Environment;
  *
  * @author Phillip Webb
  */
+@Slf4j
 class SpringBootBanner implements Banner {
 
 	private static final String[] BANNER = { "", "  .   ____          _            __ _ _",
@@ -41,9 +43,13 @@ class SpringBootBanner implements Banner {
 
 	@Override
 	public void printBanner(Environment environment, Class<?> sourceClass, PrintStream printStream) {
+		log.info("===准备输出原始banner====");
 		for (String line : BANNER) {
-			printStream.println(line);
+			log.error(line);
+			//printStream.println(line);
 		}
+		log.info("===输出原始banner结束====");
+
 		String version = SpringBootVersion.getVersion();
 		version = (version != null) ? " (v" + version + ")" : "";
 		StringBuilder padding = new StringBuilder();
