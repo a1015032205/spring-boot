@@ -60,10 +60,10 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 		this.application = application;
 		this.args = args;
 		this.initialMulticaster = new SimpleApplicationEventMulticaster();
-		for (ApplicationListener<?> listener : application.getListeners()) {
+		for (ApplicationListener<?> listener : application.getListeners()) {//，这个方法会把之前在SpringApplication对象中保存的listenres对象拿到，就是我们之前保存的11个listener都可以拿到了。
 			this.initialMulticaster.addApplicationListener(listener);
 		}
-	}
+	}//添加进EventPublishingRunListener这个对象的initialMulticaster这个属性中的defaultRetriver中的applicationListeners中保存起来了。这个保存至关重要，因为在后面调用staring()方法以及环境准备好通知listener进行回调的时候会用到这些个listener。
 
 	@Override
 	public int getOrder() {

@@ -277,7 +277,7 @@ public class SpringApplication {
 		System.out.println();
 		System.out.println();
 		log.debug(">>>getSpringFactoriesInstances by ApplicationContextInitializer start<<");
-		//实例化初始器  这里实现自动装配  META-INF/spring.factories
+		//实例化初始器   搜索META-INF\spring.factories文件配置的ApplicationContextInitializer的实现类
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
 		log.debug("getSpringFactoriesInstances by ApplicationContextInitializer end");
 		System.out.println();
@@ -285,7 +285,7 @@ public class SpringApplication {
 		System.out.println();
 
 		log.debug(">>>getSpringFactoriesInstances by ApplicationListener start<<");
-		//实例华监听器
+		//实例化监听器 搜索META-INF\spring.factories文件配置的ApplicationListenerr的实现类
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
 		log.debug(">>>getSpringFactoriesInstances by ApplicationListener end<<");
 		System.out.println();
@@ -329,6 +329,7 @@ public class SpringApplication {
 
 		//创建上下文环境
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
+		//申明配置上下文
 		ConfigurableApplicationContext context = null;
 
 		// 设置java.awt.headless系统属性，默认为true
@@ -339,7 +340,7 @@ public class SpringApplication {
 		//它主要是负责发布SpringApplicationEvent事件的，
 		// 它会利用一个内部的ApplicationEventMulticaster在上下文实际被刷新之前对事件进行处理
 		SpringApplicationRunListeners listeners = getRunListeners(args);
-		//通知监听者 启动
+		//通知监听者 启动 广播
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);

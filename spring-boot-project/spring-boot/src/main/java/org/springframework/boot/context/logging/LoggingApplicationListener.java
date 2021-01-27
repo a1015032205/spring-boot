@@ -229,7 +229,7 @@ public class LoggingApplicationListener implements GenericApplicationListener {
 
 	private void onApplicationStartingEvent(ApplicationStartingEvent event) {
 		this.loggingSystem = LoggingSystem.get(event.getSpringApplication().getClassLoader());
-		this.loggingSystem.beforeInitialize();
+		this.loggingSystem.beforeInitialize();//LogbackLoggingSystem
 	}
 
 	private void onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent event) {
